@@ -7,7 +7,9 @@ Bean容器是Spring框架的一个核心部分，它管理应用中定义的bean
 ## 三、简单的bean容器
 接下来就是简单的模拟bean容器，用简单的方式来实现bean的定义以及bean的注册和获取。
 ### 1、类图
-如图所示，Spring Bean容器的类图<br />![spring-1-类图.png](https://imgur.com/4vzBOzr)<br />这里也就两个主要类：BeanDefinition和BeanFactory，这里只是简单的实现，就只是为了模拟spring中bean的注册和获取，这里的类名都和spring源码的一致。
+如图所示，Spring Bean容器的类图<br />
+<img src="images/spring-1-类图.png">
+<br />这里也就两个主要类：BeanDefinition和BeanFactory，这里只是简单的实现，就只是为了模拟spring中bean的注册和获取，这里的类名都和spring源码的一致。
 
 - BeanDefinition：这个是bean的定义，目前属性就只有一个Object，用来表示实例化对象信息，通过构造器传递bean对象信息，并且通过getBean()方法来获取定义的对象。
 - BeanFactory：表示Bean的工厂，里面定义了一个Map集合来存储Bean对象。
