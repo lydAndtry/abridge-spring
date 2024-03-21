@@ -38,8 +38,11 @@ public class BeanDefinition {
 本次的学习就是简单的认识以下bean容器，因此这里只有一个Object来存储bean对象，我们可以到spring源码中查找这个类名`BeanDefinition`（找到的是一个接口），可以发现其里面还有`SCOPE_SINGLETON`,`SCOPE_PROTOTYPE`等等，目前只是简单实现，后续会慢慢增加。
 ### 3、Bean工厂
 BeanFactory主要是用来生成Bean对象，在 Spring 框架中用于管理 Bean 的一个工厂接口，它提供了高级 IoC（控制反转）的支持。`BeanFactory`是 Spring IoC 容器的根接口，负责配置、创建和管理应用中的 Beans。
+
 ```java
 package cn.abridge.springframework;
+
+import cn.abridge.springframework.beans.factory.config.BeanDefinition;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,11 +86,12 @@ public class UserService {
 }
 ```
 需要通过注册bean对象，获取bean对象来执行这个方法。
+
 ```java
 package cn.abridge.springframework.test;
 
-import cn.abridge.springframework.BeanDefinition;
-import cn.abridge.springframework.BeanFactory;
+import cn.abridge.springframework.beans.factory.config.BeanDefinition;
+import cn.abridge.springframework.beans.factory.BeanFactory;
 import cn.abridge.springframework.test.bean.UserService;
 import org.junit.Test;
 
@@ -99,7 +103,7 @@ import org.junit.Test;
 public class ApiTest {
 
     @Test
-    public void test_BeanFactory(){
+    public void test_BeanFactory() {
         // 1.初始化 BeanFactory
         BeanFactory beanFactory = new BeanFactory();
 
