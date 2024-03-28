@@ -13,7 +13,7 @@ import org.junit.Test;
 public class ApiTest {
 
     @Test
-    public void test_BeanFactory(){
+    public void test_BeanFactoryUseCGLIB(){
         String beanName = "userService";
         // 1、初始化BeanFactory
         DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
@@ -21,12 +21,13 @@ public class ApiTest {
         BeanDefinition beanDefinition = new BeanDefinition(UserService.class);
         beanFactory.registerBeanDefinition(beanName, beanDefinition);
         // 3、获取bean
-        UserService bean = (UserService) beanFactory.getBean(beanName);
+        UserService bean = (UserService) beanFactory.getBean(beanName, "liyongde", "25");
         bean.getUserInfo();
-        System.out.println("第一次的bean对象：" + bean);
-        // 4、从单例池获取bean
-        UserService singletonBean = (UserService) beanFactory.getBean(beanName);
-        singletonBean.getUserInfo();
-        System.out.println("第二次的bean对象：" + singletonBean);
+        System.out.println("UserService的bean对象：" + bean);
+    }
+
+    @Test
+    public void test_GraalVM() {
+        System.out.println(System.getProperty("org.graalvm.nativeimage.imagecode"));
     }
 }

@@ -11,24 +11,39 @@ import cn.abridge.springframework.beans.factory.config.BeanDefinition;
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
 
+    @Override
+    public Object getBean(String name) throws BeansException {
+        return doGetBean(name, (Object) null);
+    }
+
     /**
      * 实现BeanFactory获取bean对象
      * @param name bean名
      * @return bean对象
      */
     @Override
-    public Object getBean(String name) {
+    public Object getBean(String name, Object... args) {
+        return doGetBean(name, args);
+    }
+
+    /**
+     * 抽取方法，获取Bean对象
+     * @param name bena名称
+     * @param args 参数
+     * @return bean实例
+     * @param <T> 泛型
+     */
+    protected <T> T doGetBean(String name, Object... args) {
         // 获取单例bean对象
         Object bean = getSingleton(name);
         if (bean != null) {
-            return bean;
+            return (T) bean;
         }
         // 创建bean定义
         BeanDefinition beanDefinition = getBeanDefinition(name);
         // 调用创建bean对象
-        return createBean(name, beanDefinition);
+        return (T) createBean(name, beanDefinition, args);
     }
-
     /**
      * 返回给定bean名称的bean定义
      * <p>
@@ -42,13 +57,10 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
     /**
      * 获取bean对象
-     * <p>
-     *     这里与spring源码不同的一点是，这里少了显式参数
-     * </p>
      * @param beanName bean名称
      * @param mbd bean定义
      * @return bean对象
      * @throws BeansException 抛出的bean异常
      */
-    protected abstract Object createBean(String beanName, BeanDefinition mbd) throws BeansException;
+    protected abstract Object createBean(String beanName, BeanDefinition mbd, Object... args) throws BeansException;
 }

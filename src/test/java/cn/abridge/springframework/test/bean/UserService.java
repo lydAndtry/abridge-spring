@@ -6,7 +6,15 @@ package cn.abridge.springframework.test.bean;
  * @Description:
  */
 public class UserService {
+    private String name;
+    private String age;
+
+    public UserService(String name, String age) {
+        this.name = name;
+        this.age = age;
+    }
+
     public void getUserInfo(){
-        System.out.println("获取用户信息!!!");
+        System.out.println("获取用户信息!!!" + name + " " + age);
     }
 }
