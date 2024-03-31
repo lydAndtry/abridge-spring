@@ -6,15 +6,28 @@ package cn.abridge.springframework.test.bean;
  * @Description:
  */
 public class UserService {
-    private String name;
-    private String age;
+    private String id;
 
-    public UserService(String name, String age) {
-        this.name = name;
-        this.age = age;
-    }
+    private UserDao userDao;
 
     public void getUserInfo(){
-        System.out.println("获取用户信息!!!" + name + " " + age);
+        System.out.println("执行中。。。");
+        System.out.println(userDao.queryUserId(id));
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public UserDao getUserDao() {
+        return userDao;
+    }
+
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
     }
 }

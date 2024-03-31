@@ -1,8 +1,12 @@
 package cn.abridge.springframework.beans.factory.support;
 
 import cn.abridge.springframework.beans.BeansException;
+import cn.abridge.springframework.beans.PropertyValue;
+import cn.abridge.springframework.beans.PropertyValues;
 import cn.abridge.springframework.beans.factory.config.BeanDefinition;
+import cn.abridge.springframework.beans.factory.config.BeanReference;
 import cn.abridge.springframework.core.NativeDetector;
+import cn.hutool.core.bean.BeanUtil;
 
 import java.lang.reflect.Constructor;
 
@@ -24,7 +28,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         if (NativeDetector.inNativeImage()) {
             this.instantiationStrategy = new SimpleInstantiationStrategy();
         } else {
-            this.instantiationStrategy = new SimpleInstantiationStrategy();
+            this.instantiationStrategy = new CglibSubclassingInstantiationStrategy();
         }
     }
 
@@ -41,12 +45,37 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         try {
             // 创建bean实例 将其抽取出去
             bean = createBeanInstance(mbd, beanName, args);
+            // 给 Bean 填充属性
+            applyPropertyValues(beanName, bean, mbd);
         } catch (Exception e) {
-            throw new BeansException("bean对象的初始化失败!");
+            throw new BeansException("bean对象的初始化失败!", e);
         }
         // 添加单例bean
         addSingleton(beanName, bean);
         return bean;
+    }
+
+    private void applyPropertyValues(String beanName, Object bean, BeanDefinition mbd) {
+        try {
+            // 通过bean定义获取属性对象的容器
+            PropertyValues propertyValues = mbd.getPropertyValues();
+            for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
+                String name = propertyValue.getName();
+                Object value = propertyValue.getValue();
+                // 这里通过判断是否为BeanReference类，是的话表示是个依赖的Bean对象，需要通过获取Bean，
+                // 不存在的话会通过创建这个bean对象（创建的时候需要bean定义，因为早之前就已经注册，
+                // 在内存中是可以获取到的）。
+                if (value instanceof BeanReference) {
+                    // A依赖B，实例化B
+                    BeanReference reference = (BeanReference) value;
+                    value = getBean(reference.getBeanName());
+                }
+                // 通过反射来实现填充属性 （BeanUtil: Hutool工具包下的方法）
+                BeanUtil.setFieldValue(bean, name, value);
+            }
+        } catch (Exception e) {
+            throw new BeansException("Bean " + beanName + " 设置属性值错误");
+        }
     }
 
     private Object createBeanInstance(BeanDefinition mbd, String beanName, Object... args) {
