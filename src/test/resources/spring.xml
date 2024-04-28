@@ -5,5 +5,10 @@
     <bean id="userService" class="cn.abridge.springframework.test.bean.UserService">
         <property name="id" value="1"/>
         <property name="userDao" ref="userDao"/>
+        <property name="address" value="浙江杭州"/>
+        <property name="tel" value="86-0571"/>
     </bean>
+
+    <bean class="cn.abridge.springframework.test.common.BeanFactoryPostProcessorTest"/>
+    <bean class="cn.abridge.springframework.test.common.BeanPostProcessorTest"/>
 </beans>

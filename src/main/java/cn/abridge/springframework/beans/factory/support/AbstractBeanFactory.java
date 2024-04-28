@@ -1,15 +1,34 @@
 package cn.abridge.springframework.beans.factory.support;
 
 import cn.abridge.springframework.beans.BeansException;
-import cn.abridge.springframework.beans.factory.BeanFactory;
 import cn.abridge.springframework.beans.factory.config.BeanDefinition;
+import cn.abridge.springframework.beans.factory.config.BeanPostProcessor;
+import cn.abridge.springframework.beans.factory.config.ConfigurableBeanFactory;
+import cn.abridge.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author: lyd
  * @Date: 2024/3/20 21:33
  * @Description: 抽象类定义模板方法
  */
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        Assert.notNull(beanPostProcessor, "BeanPostProcessor 不能为空");
+        // 有就覆盖
+        this.beanPostProcessors.remove(beanPostProcessor);
+        this.beanPostProcessors.add(beanPostProcessor);
+    }
+
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.beanPostProcessors;
+    }
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -24,6 +43,11 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
     @Override
     public Object getBean(String name, Object... args) {
         return doGetBean(name, args);
+    }
+
+    @Override
+    public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+        return ((T) getBean(name));
     }
 
     /**

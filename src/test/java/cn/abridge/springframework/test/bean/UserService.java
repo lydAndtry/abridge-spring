@@ -8,11 +8,14 @@ package cn.abridge.springframework.test.bean;
 public class UserService {
     private String id;
 
+    private String address;
+
+    private String tel;
+
     private UserDao userDao;
 
     public void getUserInfo(){
-        System.out.println("执行中。。。");
-        System.out.println(userDao.queryUserId(id));
+        System.out.println(userDao.queryUserId(id) + " 地址：" + address + " TEL: " + tel);
     }
 
     public String getId() {
@@ -29,5 +32,21 @@ public class UserService {
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
     }
 }

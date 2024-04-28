@@ -36,6 +36,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     }
 
     @Override
+    public void preInstantiateSingletons() throws BeansException {
+        beanDefinitionMap.keySet().forEach(this::getBean);
+    }
+
+    @Override
     public boolean containsBeanDefinition(String beanName) {
         Assert.notNull(beanName, "Bean名称不能为空");
         return this.beanDefinitionMap.containsKey(beanName);

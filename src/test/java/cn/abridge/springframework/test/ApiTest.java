@@ -3,13 +3,17 @@ package cn.abridge.springframework.test;
 import cn.abridge.springframework.beans.PropertyValue;
 import cn.abridge.springframework.beans.PropertyValues;
 import cn.abridge.springframework.beans.factory.config.BeanDefinition;
+import cn.abridge.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import cn.abridge.springframework.beans.factory.config.BeanReference;
 import cn.abridge.springframework.beans.factory.support.DefaultListableBeanFactory;
 import cn.abridge.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import cn.abridge.springframework.context.support.ClassPathXmlApplicationContext;
 import cn.abridge.springframework.core.io.DefaultResourceLoader;
 import cn.abridge.springframework.core.io.Resource;
 import cn.abridge.springframework.test.bean.UserDao;
 import cn.abridge.springframework.test.bean.UserService;
+import cn.abridge.springframework.test.common.BeanFactoryPostProcessorTest;
+import cn.abridge.springframework.test.common.BeanPostProcessorTest;
 import cn.hutool.core.io.IoUtil;
 import org.junit.Test;
 
@@ -22,6 +26,33 @@ import java.io.InputStream;
  * @Description: 测试类
  */
 public class ApiTest {
+
+    @Test
+    public void test_ApplicationContext() throws IOException {
+        // 1. 获取上下文应用
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        // 2. 获取Bean对象调用方法
+        UserService userService = applicationContext.getBean("userService", UserService.class);
+        userService.getUserInfo();
+    }
+
+    @Test
+    public void test_BeanPostProcessor() {
+        // 1 获取默认的Bean工厂
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        // 2 解析XML, 注册Bean
+        XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        xmlBeanDefinitionReader.loadBeanDefinitions("classpath:spring.xml");
+        // 3.1 执行Bean实例化前置处理
+        BeanFactoryPostProcessorTest beanFactoryPostProcessorTest = new BeanFactoryPostProcessorTest();
+        beanFactoryPostProcessorTest.postProcessBeanFactory(beanFactory);
+        // 3.2 实例化之后的处理
+        BeanPostProcessorTest beanPostProcessorTest = new BeanPostProcessorTest();
+        beanFactory.addBeanPostProcessor(beanPostProcessorTest);
+        // 4 获取bean对象
+        UserService userService = beanFactory.getBean("userService", UserService.class);
+        userService.getUserInfo();
+    }
 
     @Test
     public void test_ReadXmlFile() {
