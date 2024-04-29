@@ -4,12 +4,10 @@ import cn.abridge.springframework.beans.BeansException;
 import cn.abridge.springframework.beans.factory.support.DefaultListableBeanFactory;
 import cn.abridge.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 
-import java.io.IOException;
-
 /**
  * @Author: lyd
  * @Date: 2024/4/18 22:59
- * @Description:
+ * @Description: 加载XML中的bean
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableApplicationContext {
 

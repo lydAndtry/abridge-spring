@@ -77,7 +77,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
     /**
      * 完成此上下文的bean工厂的初始化，初始化所有剩余的单例bean。
-     * @param beanFactory
+     * @param beanFactory bean工厂
      */
     protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
         // 目前只做一件事：提前实例化单例bean
@@ -89,9 +89,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         return getBeanFactory();
     }
 
+    /**
+     * 子类必须在这里返回他们的内部bean工厂。他们应该有效地实现查找，这样可以在不影响性能的情况下反复调用。
+     * @return 这个应用上下文的内部bean工厂（永远不会是{@code null}）
+     * @throws IllegalStateException /
+     */
     @Override
     public abstract ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
 
 
+    /**
+     * 子类必须实现这个方法来执行实际的配置加载。此方法由 {@link #refresh()} 在进行任何其他初始化工作之前调用。
+     * <p>一个子类将要么创建一个新的bean工厂并持有其引用，要么返回它持有的单个BeanFactory实例。
+     * 在后一种情况下，如果多次刷新上下文，它通常会抛出IllegalStateException。</p>
+     * @throws BeansException /
+     */
     protected abstract void refreshBeanFactory() throws BeansException;
 }
