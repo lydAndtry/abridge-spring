@@ -1,11 +1,14 @@
 package cn.abridge.springframework.test.bean;
 
+import cn.abridge.springframework.beans.factory.DisposableBean;
+import cn.abridge.springframework.beans.factory.InitializingBean;
+
 /**
  * @Author: lyd
  * @Date: 2024/3/19 20:54
  * @Description:
  */
-public class UserService {
+public class UserService implements InitializingBean, DisposableBean {
     private String id;
 
     private String address;
@@ -48,5 +51,22 @@ public class UserService {
 
     public void setTel(String tel) {
         this.tel = tel;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("userService通过实现[DisposableBean]的销毁方法，执行了destroy()");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("userService通过实现[InitializingBean]的初始化方法，执行了afterPropertiesSet()");
+    }
+
+    public void initDataMethod() {
+        System.out.println("userService另一个初始化方法");
+    }
+    public void destroyDataMethod(){
+        System.out.println("userService另一个销毁方法");
     }
 }

@@ -105,4 +105,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * @throws BeansException /
      */
     protected abstract void refreshBeanFactory() throws BeansException;
+
+    @Override
+    public void close() {
+        doClose();
+    }
+
+    @Override
+    public void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+    }
+
+    protected void doClose() {
+        destroyBeans();
+    }
+
+    protected void destroyBeans() {
+        getBeanFactory().destroySingletons();
+    }
 }

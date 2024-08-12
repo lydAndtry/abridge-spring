@@ -28,4 +28,9 @@ public interface ConfigurableListableBeanFactory
      * @throws BeansException 创建bean发生异常
      */
     void preInstantiateSingletons() throws BeansException;
+
+    /**
+     * 销毁单例bean
+     */
+    void destroySingletons();
 }

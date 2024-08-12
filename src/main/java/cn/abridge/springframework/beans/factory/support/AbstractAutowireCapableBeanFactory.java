@@ -3,14 +3,20 @@ package cn.abridge.springframework.beans.factory.support;
 import cn.abridge.springframework.beans.BeansException;
 import cn.abridge.springframework.beans.PropertyValue;
 import cn.abridge.springframework.beans.PropertyValues;
+import cn.abridge.springframework.beans.factory.DisposableBean;
+import cn.abridge.springframework.beans.factory.InitializingBean;
 import cn.abridge.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import cn.abridge.springframework.beans.factory.config.BeanDefinition;
 import cn.abridge.springframework.beans.factory.config.BeanPostProcessor;
 import cn.abridge.springframework.beans.factory.config.BeanReference;
 import cn.abridge.springframework.core.NativeDetector;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.StrUtil;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * @Author: lyd
@@ -55,28 +61,70 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         } catch (Exception e) {
             throw new BeansException("bean对象的初始化失败!", e);
         }
+        //注册有销毁方法的bean
+        registerDisposableBeanIfNecessary(beanName, bean, mbd);
         // 添加单例bean
         addSingleton(beanName, bean);
         return bean;
     }
 
     /**
-     *
-     * @param beanName
-     * @param bean
-     * @param mbd
-     * @return
+     * 将给定的Bean添加到工厂中可销毁Bean的列表中，注册其DisposableBean接口和/或指定的销毁方法，
+     * 以便在工厂关闭时调用（如果适用）。此操作仅适用于单例模式的Bean。
+     * @param beanName bean名
+     * @param bean bean实例
+     * @param mbd bean定义
+     */
+    private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition mbd) {
+        if (bean instanceof DisposableBean || StrUtil.isNotEmpty(mbd.getDestroyMethodName())) {
+            registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, mbd));
+        }
+    }
+
+    /**
+     * 初始化给定的Bean实例，应用工厂回调、初始化方法以及Bean后置处理器。
+     * <p>从 {@link #createBean} 调用，用于传统定义的Bean；从 {@link #initializeBean} 调用，用于已有的Bean实例。</p>
+     * @param beanName 工厂中的bean名称
+     * @param bean Bean对象
+     * @param mbd Bean定义
+     * @return 初始化后的Bean实例（可能被包装过）。
      */
     private Object initializeBean(String beanName, Object bean, BeanDefinition mbd) {
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
-        // todo 后面会在此处执行bean的初始化方法
-        invokeInitMethods(beanName, wrappedBean, mbd);
+        // 在此处执行bean的初始化方法
+        try {
+            invokeInitMethods(beanName, wrappedBean, mbd);
+        } catch (Throwable ex) {
+            throw new BeansException("调用bean [" + beanName + "] 初始化方法失败", ex);
+        }
         wrappedBean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
         return wrappedBean;
     }
 
-    protected void invokeInitMethods(String beanName, Object wrappedBean, BeanDefinition mbd) {
-        // todo: 后续实现
+    protected void invokeInitMethods(String beanName, Object bean, BeanDefinition mbd) throws Exception {
+        // 这里简化操作，判断是否InitializingBean
+        boolean isInitializingBean = (bean instanceof InitializingBean);
+        if (isInitializingBean) {
+            // 强转并执行
+            ((InitializingBean) bean).afterPropertiesSet();
+        }
+        String initMethodName = mbd.getInitMethodName();
+        if (StrUtil.isNotEmpty(initMethodName) &&
+                !(isInitializingBean && "afterPropertiesSet".equals(initMethodName))) {
+            // 调用自定义初始化方法
+            invokeCustomInitMethod(beanName, bean, mbd);
+        }
+    }
+
+    private void invokeCustomInitMethod(String beanName, Object bean, BeanDefinition mbd) throws Exception {
+        // 通过反射完成
+        String initMethodName = mbd.getInitMethodName();
+        Assert.state(initMethodName != null, "没有定义的初始化方法");
+        Method initMethod = ClassUtil.getPublicMethod(mbd.getBeanClass(), initMethodName);
+        if (initMethod == null) {
+            throw new BeansException("无法在名为 '" + beanName + "' 的bean上找到名为 '" + initMethodName + "' 的初始化方法");
+        }
+        initMethod.invoke(bean);
     }
 
     @Override

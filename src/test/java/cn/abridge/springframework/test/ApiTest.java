@@ -27,6 +27,13 @@ import java.io.InputStream;
  */
 public class ApiTest {
 
+    // 初始化测试方法
+    @Test
+    public void test_InitBeanAndDestroyMethod() throws IOException {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutdownHook();
+    }
+
     @Test
     public void test_ApplicationContext() throws IOException {
         // 1. 获取上下文应用
