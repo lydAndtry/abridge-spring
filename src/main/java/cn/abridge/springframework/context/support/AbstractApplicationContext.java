@@ -4,6 +4,7 @@ import cn.abridge.springframework.beans.BeansException;
 import cn.abridge.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import cn.abridge.springframework.beans.factory.config.BeanPostProcessor;
 import cn.abridge.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import cn.abridge.springframework.context.ApplicationContextAwareProcessor;
 import cn.abridge.springframework.context.ConfigurableApplicationContext;
 import cn.abridge.springframework.core.io.DefaultResourceLoader;
 
@@ -23,6 +24,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     public void refresh() throws BeansException, IllegalStateException {
         // 实现刷新容器
         ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+        // 添加ApplicationContextAwareProcessor，让继承自ApplicationContextAware的bean能感知bean
+        beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
         // 注册Bean实例化前的处理器
         invokeBeanFactoryPostProcessors(beanFactory);
         // 注册Bean前后置处理器

@@ -3,8 +3,7 @@ package cn.abridge.springframework.beans.factory.support;
 import cn.abridge.springframework.beans.BeansException;
 import cn.abridge.springframework.beans.PropertyValue;
 import cn.abridge.springframework.beans.PropertyValues;
-import cn.abridge.springframework.beans.factory.DisposableBean;
-import cn.abridge.springframework.beans.factory.InitializingBean;
+import cn.abridge.springframework.beans.factory.*;
 import cn.abridge.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import cn.abridge.springframework.beans.factory.config.BeanDefinition;
 import cn.abridge.springframework.beans.factory.config.BeanPostProcessor;
@@ -90,6 +89,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * @return 初始化后的Bean实例（可能被包装过）。
      */
     private Object initializeBean(String beanName, Object bean, BeanDefinition mbd) {
+        invokeAwareMethods(beanName, bean);
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
         // 在此处执行bean的初始化方法
         try {
@@ -99,6 +99,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
         wrappedBean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
         return wrappedBean;
+    }
+
+    /**
+     * 回调感知方法
+     * @param beanName bean名称
+     * @param bean bean
+     */
+    private void invokeAwareMethods(String beanName, Object bean) {
+        if (bean instanceof Aware) {
+            // 其他感知的设置
+            if (bean instanceof BeanFactoryAware) {
+                ((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.this);
+            }
+        }
     }
 
     protected void invokeInitMethods(String beanName, Object bean, BeanDefinition mbd) throws Exception {

@@ -7,9 +7,11 @@ import cn.abridge.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import cn.abridge.springframework.beans.factory.config.BeanReference;
 import cn.abridge.springframework.beans.factory.support.DefaultListableBeanFactory;
 import cn.abridge.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import cn.abridge.springframework.context.ApplicationContext;
 import cn.abridge.springframework.context.support.ClassPathXmlApplicationContext;
 import cn.abridge.springframework.core.io.DefaultResourceLoader;
 import cn.abridge.springframework.core.io.Resource;
+import cn.abridge.springframework.test.bean.AwareTestBean;
 import cn.abridge.springframework.test.bean.UserDao;
 import cn.abridge.springframework.test.bean.UserService;
 import cn.abridge.springframework.test.common.BeanFactoryPostProcessorTest;
@@ -26,6 +28,24 @@ import java.io.InputStream;
  * @Description: 测试类
  */
 public class ApiTest {
+
+    @Test
+    public void test_awareUse2() throws IOException {
+        String beanName = "userService";
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        Object bean = applicationContext.getBean(beanName);
+    }
+
+    @Test
+    public void test_awareUse1() throws IOException {
+        String beanName = "awareTestBean";
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        AwareTestBean bean = applicationContext.getBean(beanName, AwareTestBean.class);
+        ApplicationContext app = bean.getApplicationContext();
+        System.out.println("aware: " + app);
+        System.out.println("applicationContext: " + applicationContext);
+        System.out.println(bean.getBeanFactory());
+    }
 
     // 初始化测试方法
     @Test

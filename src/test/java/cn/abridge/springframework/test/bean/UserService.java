@@ -1,14 +1,17 @@
 package cn.abridge.springframework.test.bean;
 
+import cn.abridge.springframework.beans.BeansException;
 import cn.abridge.springframework.beans.factory.DisposableBean;
 import cn.abridge.springframework.beans.factory.InitializingBean;
+import cn.abridge.springframework.context.ApplicationContext;
+import cn.abridge.springframework.context.ApplicationContextAware;
 
 /**
  * @Author: lyd
  * @Date: 2024/3/19 20:54
  * @Description:
  */
-public class UserService implements InitializingBean, DisposableBean {
+public class UserService implements InitializingBean, DisposableBean, ApplicationContextAware {
     private String id;
 
     private String address;
@@ -68,5 +71,10 @@ public class UserService implements InitializingBean, DisposableBean {
     }
     public void destroyDataMethod(){
         System.out.println("userService另一个销毁方法");
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        System.out.println("userService获得ApplicationContext：" + applicationContext);
     }
 }

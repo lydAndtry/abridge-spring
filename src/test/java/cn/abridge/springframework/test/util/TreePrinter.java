@@ -10,7 +10,7 @@ import java.io.File;
 public class TreePrinter {
     public static void main(String[] args) {
         // 指定文件夹的路径
-        String folderPath = "D:\\Code\\Work\\lms\\nladmin-ui\\src\\i18n";
+        String folderPath = "D:\\Code\\Study\\abridge-spring\\src\\main\\java";
 
         // 调用递归方法获取文件树并打印
         File folder = new File(folderPath);
